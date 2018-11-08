@@ -5,4 +5,4 @@ This was a UI/UX class project which I further developed outside of the class. T
 
 Initially, the project was created through multiple cycles of ideation, need-finding, prototyping, user-testing, and evaluation. After the class was over, I edited and added more codes for both front-end and back-end.
 
-Visit website [here](junseonghong.com)
+Visit website [here](http://django-env.cmi95gspuf.us-west-1.elasticbeanstalk.com/las/)
