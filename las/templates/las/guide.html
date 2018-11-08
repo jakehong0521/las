@@ -1,0 +1,84 @@
+{% extends 'las/navbar.html' %}
+{% block main %}
+{% load static %}
+
+<head><title>User Guide</title></head>
+
+<div class="main" style="display: none;">
+    <div class="col-5 content">
+        <p>LAS stands for <i>Life as Someone Else</i>. Life as Someone Else is a platform that allows for one group of users - presumably students - to be able to see the work/tasks that professionals do on daily basis.</p>
+        <p>
+            Professionals can use <i>Life as Someone Else</i> to write diary entries of their day. This can be a chance to organize their thoughts or to give back to the community by providing a more personal perspective of their jobs rather than the generic information provided on the internet.
+        </p>
+        <p>
+            Non-professionals can learn about a profession on a personal level as they read about the daily activities of working professionals.
+        </p>
+    </div>
+    <div class="col-5 content right">
+        <div class="desktop" style="height: 30vh"></div>
+        <img src='{% static "las/css/guide1.png" %}' alt="guide1">
+        <p>If you are a working professional and would like to share your work experience, press "Sign Up / Sign In".</p>
+        <p>If you would like to read posts from working professionals, press "Search By Field".</p>
+    </div>
+    <div class="col-5 content">
+        <div class="desktop" style="height: 30vh"></div>
+        <img class="desktop" src='{% static "las/css/guide2d.png" %}' alt="guide2">
+        <img class="mobile" src='{% static "las/css/guide2m.png" %}' alt="guide2">
+        <p>After logging in, professionals can start writing about their job, themselves, or daily work they do.</p>
+    </div>
+    <div class="col-5 content right">
+        <div class="desktop" style="height: 30vh"></div>
+        <img class="desktop" src='{% static "las/css/guide3d.png" %}' alt="guide3">
+        <img class="mobile" src='{% static "las/css/guide3m.png" %}' alt="guide3">
+        <p>Non-professionals can explore jobs by each field on this category page. Search by a field and click on any profile to read the person's posts.</p>
+    </div>
+</div>
+
+<div id="background">
+    <img id="background_img" src="{% static 'las/css/background.png' %}" alt="LAS">
+</div>
+
+<style>
+    .main {
+        overflow: auto;
+        height: 90vh;
+        background: rgba(0, 0, 0, 0.9);
+    }
+
+    .right {
+        float: right;
+    }
+
+    .content {
+        box-sizing: border-box;
+        text-align: left;
+        color: white;
+        line-height: 1.5;
+        color: #D3D3D3;
+    }
+
+    .content img {
+        width: 100%;
+    }
+
+@media only screen and (max-width: 768px) {
+    .content {
+        padding: 5vh 10vw;
+    }
+}
+
+@media only screen and (min-width: 769px) {
+    .content {
+        padding: 5vh 5vw 0vh;
+    }
+}
+
+</style>
+
+<script type="text/javascript">
+    window.onload = function() {
+        $('.main').fadeIn(500, 'linear');
+    }
+</script>
+
+{% endblock %}

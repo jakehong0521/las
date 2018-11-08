@@ -1,0 +1,372 @@
+{% extends 'las/navbar.html' %}
+{% block main %}
+{% load static %}
+
+<div class="main">
+	<div class="desktop poster primary">
+    	<div class="info">
+			<img src="{% static 'las/css/default.jpg' %}">
+            <p>{{ poster.username }}</p>
+			<p>{{ poster.profile.title }}<br>
+                {% if poster.profile.company %}
+                at {{ poster.profile.company }}
+                {% endif %}
+            </p>
+        </div>
+        <div class="sidetab" id="side_jobdescription"><div class="vertical-center">Job Description</div></div>
+        <div class="sidetab" id="side_aboutme"><div class="vertical-center">About Me</div></div>
+        <div class="sidetab" id="side_posts"><div class="vertical-center">Posts</div></div>
+    </div>
+
+    <!-- ############################### -->
+    <!-- Mobile Poster Bar Start -->
+    <!-- ############################### -->
+
+    <div id="poster_bar" class="mobile primary" style='width: 100%; height: 10vh; position: fixed; top: 10vh;'>
+        <div class="vertical-center" style="padding-left: 4vw; float: left; font-size: 4vh">{{ poster.username }}</div>
+        <button id="toggle_poster" class="primary" onclick="togglePoster()">V</button>
+    </div>
+
+    <div id="poster_mobile" class="mobile primary" style="display: none;">
+        <button onclick="open_tab('jobdescription')">Job Description</button>
+        <button onclick="open_tab('aboutme')">About Me</button>
+        <button onclick="open_tab('posts')">Posts</button>
+    </div>
+
+    <!-- ############################### -->
+    <!-- Mobile Poster Bar End -->
+    <!-- ############################### -->
+
+    <div class="content">
+        <div class="tab" id="aboutme" style="display: none;">
+            <div class="mobile tab_description">About Me</div>
+
+            <div class='text'>
+                {% if poster.profile.aboutMe == '' %}
+                <p>Tell us about yourself!</p>
+                {% else %}
+                {{ poster.profile.aboutMe }}
+                {% endif %}
+            </div>
+
+            {% if user == poster %}
+            <form action="{% url 'post_making' %}" method="GET">
+                {% csrf_token %}
+                <input type='hidden' name="editing" value="aboutMe"></input>
+                <button class='primary' type="submit">Edit</button>
+            </form>
+            {% endif %}
+        </div>
+
+        <div class="tab" id="jobdescription" style="display: none;">
+            <div class="mobile tab_description">Job Description</div>
+
+            <div class='text'>
+                <p><b>
+                    {{ poster.profile.title }}
+                    {% if poster.profile.company %}
+                    at {{ poster.profile.company }}
+                    {% endif %}
+                </b></p>
+                {{ poster.profile.jobDescription }}
+            </div>
+            
+            {% if user == poster %}
+            <form action="{% url 'post_making' %}" method="GET">
+                {% csrf_token %}
+                <input type='hidden' name="editing" value="jobDescription"></input>
+                <button class="primary" type="submit">Edit</button>
+            </form>
+            {% endif %}
+        </div>        
+
+        <div class="tab" id="posts" style="display: none;">
+            <div class="mobile tab_description">Posts</div>
+
+            {% if user == poster %}
+            <form action="{% url 'post_making' %}" method="GET">
+                {% csrf_token %}
+                <input type='hidden' name="editing" value="new"></input>
+                <button class="secondary" type="submit">New Post</button>
+            </form>
+            {% endif %}
+
+            {% for post in posts %}
+            <div class='entry'>
+                {% csrf_token %}
+                <button class="post primary" onclick='view_post(id)' id="{{ post.pk }}" value="{{ post.date|date:'m / d / Y' }}">{{ post.date|date:'m / d / Y' }}</button>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="tab" id="post_view" style="display: none;">
+            <button class="primary" onclick='back()'>Back</button>
+            
+            <div class="mobile tab_description" id="post_date"></div>
+
+            <div class='text' id="post_content"></div>
+            
+            {% if user == poster %}
+            <form action="{% url 'post_making' %}" method="GET">
+                {% csrf_token %}
+                <button class="primary" type="submit">Edit</button>
+                <input id="edit_id" type='hidden' name="editing" value=""></input>
+            </form>
+            {% endif %}
+
+            {% if user == poster %}
+            <form action="{% url 'posts' %}" method="POST">
+                {% csrf_token %}
+                <button class="primary" type="submit">Delete</button>
+                <input id="delete_id" type='hidden' name="deleting" value=""></input>
+            </form>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+    
+<style>
+    .info {
+        height: 45vh;
+        text-align: left;
+        padding: 0vh 1vw 0vh 1vw;
+    }
+
+    .info img {
+        padding: 0;
+        margin-top: 1vw;
+        width: 100%;
+        border-radius: 100px;
+    }
+
+    .sidetab {
+        transition: all .3s linear;
+        height: 15vh;
+    }
+
+    .content {
+        box-sizing: border-box;
+        overflow: auto;
+        text-align: left;
+        line-height: 1.5;
+        padding: 5vh 5vw;
+        width: 100%;
+        font-size: 2.5vh;
+    }
+
+    .focus {
+        color: black;
+    }
+
+    .poster {
+        font-size: 2.5vh;
+        font-weight: bold;
+        width: 12.5vw;
+        height: 100%;
+    }
+
+    .post {
+        margin-top: 1vh;
+    }
+
+    /*####################################*/
+    /* Mobile Poster Menu Start*/
+    /*####################################*/
+
+    #toggle_poster {
+        transition: all 0.3s ease-out;
+        border-left: solid 1px white;
+        background: none;
+        float: right;
+        width: 10vh;
+        height: 100%;
+        border: none;
+        font-size: 5vh;
+    }
+
+    #poster_mobile {
+        width: 100%;
+        height: 80vh;
+        position: fixed;
+        top: 20vh;
+        border-top: solid 3px white;
+        z-index: 3
+    }
+
+    #poster_mobile button {
+        width: 100%;
+        border: none;
+        font-size: 5vh;
+        padding: 2vh 0vw;
+        background: none;
+        color: white;
+    }
+
+    /*####################################*/
+    /* Mobile Poster Menu End*/
+    /*####################################*/
+
+@media only screen and (max-width: 768px) {
+    .main {
+        height: 80vh;
+        top: 20vh;
+    }
+
+    #poster_bar div {
+        text-align: center;
+    }
+
+    .text {
+        font-size: 3vh;
+        margin-bottom: 5vh;
+    }
+
+    #posts button {
+        margin-top: 1vh;
+    }
+
+    .content button, #post_view button {
+        border-style: none;
+        border-radius: 5px;
+        font-size: 3vh;
+        height: 100%;
+        width: 100%;
+        margin-bottom: 1vh;
+        padding: 2vh 2vw 2vh 2vw;
+        cursor: pointer;
+        box-sizing: border-box;
+    }
+}
+
+@media only screen and (min-width: 769px) {
+    .main {
+        display: flex;
+        flex-direction: row;
+        height: 90vh;
+    }
+
+    .text {
+        padding: 1vh 5vw 1vh 5vw;
+        background-color: white;
+        border-radius: 10px;
+        margin: 2vh 0vw;
+        box-shadow: 0px 0px 7px gray;
+    }
+
+    .content button {
+        border-style: none;
+        border-radius: 5px;
+        font-size: 3vh;
+        height: 100%;
+        margin: 0;
+        padding: 2vh 2vw 2vh 2vw;
+        cursor: pointer;
+        box-sizing: border-box;
+        margin-right: 1vw;
+        margin-top: 1vh;
+    }
+
+    #post_view form button {
+        float: left;
+    }
+}
+
+</style>
+
+<script>
+    var rotated = false;
+
+    $(window).on('load', function() {
+        var wrappers = $('.text');
+        for (i = 0; i < wrappers.length; i++) {
+            var text = wrappers[i].innerHTML;
+            wrappers[i].innerHTML = text.replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+
+            if ("{{ user }}" != '{{ poster }}') {
+                $('#post_content').find('strong').css('display', 'none');
+            }
+        }
+
+        var edited = '{{ edited }}';
+
+        if (edited == 'aboutMe') {
+            show_tab('aboutme');
+        } else if (edited == 'jobDescription' || edited == 'None') {
+            show_tab('jobdescription');
+        } else if (edited == 'deleted') {
+            show_tab('posts');
+        } else {
+            view_post(edited);
+            $('#side_posts').addClass('focus default');
+        }
+    });
+
+    function show_tab(name) {
+        $("#" + name).fadeIn();
+        $('#side_' + name).addClass('focus default');
+    }
+
+    $('.sidetab').mouseover(function() {
+        if (!($(this).hasClass('focus'))) {
+            $('.sidetab').removeClass('focus default');
+            $(".tab").hide();
+            var tag = $(this).children()[0].innerHTML.toLowerCase().replace(" ", "");
+            show_tab(tag);
+        }
+    });
+
+    function togglePoster() {
+        $("#poster_mobile").slideToggle();
+        if (rotated) {
+            $("#toggle_poster")[0].style.transform = 'rotate(0deg)';
+        } else {
+            $("#toggle_poster")[0].style.transform = 'rotate(180deg)';
+        }
+        rotated = ~rotated;
+    }
+
+    function view_post(id) {
+        $('#post_date')[0].innerHTML = $("#" + id)[0].value;
+        $.ajax({
+            url: "../posts/",
+            method: "GET",
+            data: {
+                id: id,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function(response) {
+                var wrapper = $('#post_view')[0].getElementsByClassName('text')[0];
+                var text = response.replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+                wrapper.innerHTML = text;
+
+                if ("{{ user }}" == '{{ poster }}') {
+                    var edit_id = $("#edit_id")[0];
+                    var delete_id = $("#delete_id")[0];
+                    edit_id.value = id;
+                    delete_id.value = id;
+                } else {
+                    $('#post_content').find('strong').css('display', 'none');
+                }
+
+                $("#posts").hide();
+                $("#post_view").fadeIn();
+            }
+        })
+    }
+
+    function back() {
+        $("#post_view").hide();
+        $("#posts").fadeIn();;
+    }
+
+    function open_tab(tab) {
+        togglePoster();
+        $(".tab").hide();
+        $(".sidetab").removeClass('focus default');
+        show_tab(tab);
+    }
+
+</script>
+
+{% endblock %}

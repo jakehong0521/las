@@ -1,0 +1,31 @@
+{% extends 'las/navbar.html' %}
+{% block main %}
+{% load static %}
+
+<div class="main" style='display: none; color: white;'>
+    <div style="font-size: 7vh;">Thank you for visiting</div>
+    <div style="font-size: 3vh; padding-top: 4vh">Thank you for using <i>Life as Someone Else</i>. You are logged out.</div>
+</div>
+
+<div id="background" style="display: none">
+    <img id="background_img" src="{% static 'las/css/background.png' %}" alt="LAS">
+</div>
+
+<style type="text/css">
+	.main {
+        text-align: center;
+        padding: 10vh 10vw;
+        background: rgba(0, 0, 0, 0.5);
+        height: 90vh;
+    }
+</style>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#background").fadeIn(500, 'linear', function() {
+            $('.main').fadeIn(300, 'linear');
+        });
+    });
+</script>
+
+{% endblock %}

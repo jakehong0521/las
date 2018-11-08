@@ -1,0 +1,126 @@
+{% extends 'las/navbar.html' %}
+{% block main %}
+{% load static %}
+
+<div class="main">
+    <div class="row">
+        <div class="" style="text-align: left; font-size: 3vh">
+            <div style="padding-bottom: 1em;"><strong>Other users cannot see the bold texts.</strong></div>
+            <div id="editor" style="height: 45vh; font-size: 0.8em"></div>
+        </div>
+    </div>
+    <div id="buttons" style="margin-top: 1vh;">
+        {% csrf_token %}
+        <button id='publish' class="primary">Publish</button>
+        <button id='cancel' class="primary">Cancel</button>
+    </div>
+
+    <form id="edited" action="{% url 'profile' %}" method="POST" style="display: none;">
+        {% csrf_token %}
+        <input id="edited_input" type='hidden' name="edited" value=""></input>
+        <input type='hidden' name="poster" value="{{ user }}"></input>
+    </form>
+</div>
+
+<style>
+    .main {
+        height: 90vh;
+        box-sizing: border-box;
+        padding: 5% 5% 0%;
+    }
+
+    .ql-editor {
+        font-size: 15px;
+    }
+
+@media only screen and (max-width: 768px) {
+    #buttons button {
+        border-style: none;
+        color: white;
+        border-radius: 5px;
+        font-size: 1.5em;
+        height: 100%;
+        width: 100%;
+        margin: 1vh 0;
+        padding: 0.5em;
+        cursor: pointer;
+        box-sizing: border-box;
+    }
+}
+
+@media only screen and (min-width: 769px) {
+    #buttons button {
+        float: right;
+        border-style: none;
+        color: white;
+        border-radius: 5px;
+        font-size: 1.5em;
+        height: 100%;
+        margin: 0;
+        padding: 0.5em;
+        cursor: pointer;
+        box-sizing: border-box;
+        margin-left: 0.5em;
+    }
+}
+
+</style>
+
+<script>
+    $(window).on('load', function() {
+        var toolbarOptions = [
+            [{ header: [1, 2, false] }],
+            ['bold', 'italic'],
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }]
+        ];
+
+        var quill = new Quill('#editor', {
+            modules: {
+                toolbar: toolbarOptions
+            },
+            theme: 'snow'
+        });
+
+        var editing = '{{ editing }}';
+        var content = '{{ content }}';
+
+        if (editing != 'new') {
+            var wrapper = document.getElementById('editor').children[0];
+            var text = content.replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+            wrapper.innerHTML = text;
+        }
+    });
+
+    $('#cancel').click(function(event) {
+        event.preventDefault();
+        window.location.href = '../profile';
+    });
+
+    $('#publish').click(function(event) {
+        event.preventDefault();
+        var content = document.getElementById("editor").children[0].children;
+        var post = '';
+        
+        for (var i = 0; i < content.length; i++) {
+            post += content[i].outerHTML;
+        }
+
+        $.ajax({
+            url: "../post_making/",
+            method: "POST",
+            data: {
+                editing: '{{ editing }}',
+                content: post,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function(response) {
+                $("#edited_input")[0].value = response;
+                var form = $("#edited")[0];
+                form.submit();
+            }
+        })
+    });
+
+</script>
+
+{% endblock %}

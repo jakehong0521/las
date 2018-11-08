@@ -1,0 +1,108 @@
+{% extends 'las/navbar.html' %}
+{% block main %}
+{% load static %}
+
+<head><title>LAS</title></head>
+
+<div class="main" style="position: relative; top: 10vh">
+	<div class="col-6" id="screen_left" style="display: none;">
+		<div style="position: relative; text-align: center; padding: 10% 10% 0%">
+			<div style="text-align: center; font-size: 9vh">Life as Someone Else</div>
+			<div style="text-align: center; font-size: 4vh"><br><br>Share or read about the reality of the job</div>
+			<span class="mobile"><b>&darr;</b></span>
+		</div>
+	</div>
+
+	<div class="col-4" id="screen_right" style="display: none; color: #D3D3D3;">
+		<div class="screen_right_content col-10" style="display: none; box-sizing: border-box; padding: 10% 10%">
+			<span style='font-size: 3vh'>LAS is here to answer your questions</span>
+			<ul style='text-align: left; padding: 0 5%'>
+				<li>What can I expect at this career field?</li>
+				<li>What is the job really about?</li>
+				<li>How do workers actually feel?</li>
+			</ul>
+			
+			<div style='font-size: 3vh; padding: 5% 0%; text-align: left; color: #D3D3D3'>
+				<div style="margin-bottom: 2vh">If you would like to read professionals' posts</div>
+				<button class="secondary" onclick="location.href='{% url 'category' %}'">Search By Field</button>
+
+				<div style="margin: 6vh 0vw 2vh">If you would like to share about your work experience</div>
+				{% if user.is_authenticated %}
+				<button class="light" onclick="location.href='{% url 'profile' %}'">{{ user.username }}</button>
+				{% else %}
+				<button class="light" onclick="location.href='{% url 'signinup' %}'">Sign Up / Sign In</button>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+
+	<div id="background" style="display: none">
+		<img id="background_img" src="{% static 'las/css/background.png' %}" alt="LAS">
+	</div>
+</div>
+
+<style>
+	.main {
+		background: rgba(0, 0, 0, 0.4);
+	}
+
+	#screen_right {
+		height: 90vh;
+		text-align: center;
+		background: rgba(0, 0, 0, 0.6);
+		box-sizing: border-box;
+		text-align: left;
+	}
+
+	#screen_left {
+		text-align: center;
+		color: white;
+		text-shadow: 0px 0px 1vw black;
+		height: 90vh;
+		font-size: 10vh;
+	}
+
+	#screen_left div {
+		position: relative;
+		text-align: left;
+	}
+
+	form {
+		text-align: center;
+	}
+
+	.main button {
+		font-size: 1em;
+		border-style: none;
+		border-radius: 5px;
+		height: 2em;
+		margin-top: 0.5em;
+		cursor: pointer;
+		padding: 0;
+		width: 100%;
+	}
+
+	.main button:hover {
+		filter: brightness(125%);
+	}
+
+@media only screen and (min-width: 769px) {
+	body {
+		overflow: hidden;
+	}
+}
+
+</style>
+
+<script>
+	$(window).on('load', function() {
+		$("#screen_left").fadeIn(500);
+		$("#background").fadeIn(1000, 'linear', function() {
+			$("#screen_right").show('slide', { direction: 'right', transition: 'ease-out' }, 700, function() {
+				$(".screen_right_content").fadeIn(500);
+			});
+		});
+	});
+</script>
+
+{% endblock %}

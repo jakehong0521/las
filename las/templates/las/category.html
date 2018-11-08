@@ -1,0 +1,372 @@
+{% extends 'las/navbar.html' %}
+{% block main %}
+{% load static %}
+
+<div class='main'>
+	<div id="fields" class="col-2">
+		<div class='mobile'>
+			<input autocomplete="off" id="keyword" type="text" onkeyup='filter_fields(this.value)' placeholder="Search by Field">
+		</div>
+		{% for field in fields %}
+		{% if field != 'N/A' %}
+		{% csrf_token %}
+		<div class='field unfocus' id="{{ field }}" onclick="get_profiles('{{ field }}')">
+			<div class="vertical-center" style="float: left; padding-left: 2vh">{{ field }}</div>
+			<div class="vertical-center desktop" style="font-size: 4vh; float: right; padding-right: 1.5vh; color: white;">></div>
+			<div class="vertical-center mobile" style="float: right; padding-right: 2vh;">></div>
+		</div>
+		{% endif %}
+		{% endfor %}
+	</div>
+
+	<div class="col-8" align='center' id="profiles">
+		<div id="back" class="primary mobile">
+			<div class="vertical-center">Back</div>
+		</div>
+	</div>
+</div>
+
+<div id="notice" style="display: none;">
+	<div id="notice_message" class='vertical-center'>If you would like to see an example, please click or search by "Engineering" and click "jakehong"</div>
+	<button id="notice_hide" onclick="disable_notice()">Don't Show this Message Again</button>
+	<button id="notice_ok" onclick="hide_notice()">Ok</button>
+</div>
+
+<style>
+	.main {
+		height: 90vh;
+		width: 100vw;
+		text-align: center;
+	}
+
+	.main .field {
+		padding: 1vh 0vw;
+		height: 5vh;
+		transition: all 0.2s ease-out;
+		cursor: pointer;
+	}
+
+	#keyword {
+		text-align: center;
+		font-size: 4vh;
+        height: 8vh;
+        width: 90vw;
+        border: solid 2px #ff7a59;
+        border-radius: 10px;
+        margin: 3vh 0vw;
+	}
+
+	#back {
+		width: 80%;
+		border-radius: 5px;
+		height: 10vh;
+		margin: 2vh 0vw;
+		font-size: 5vh;
+	}
+
+	img {
+		float: left;
+	}
+
+	.profile button {
+		margin: 0;
+		padding: 0;
+		position: relative;
+		background: none;
+		border: none;
+		width: 100%;
+		height: 100%;
+	}
+
+	#notice {
+		z-index: 15;
+		background: rgba(0, 0, 0, 0.95);
+		height: 100vh;
+		width: 100vw;
+		position: fixed;
+		top: 0;
+		left: 0;
+		color: #D3D3D3;
+	}
+
+	#notice_message {
+		line-height: 1.5;
+		font-size: 20px;
+		padding: 0 20%;
+	}
+
+	#notice_ok, #notice_hide {
+		font-size: 15px;
+		color: #D3D3D3;
+		height: 10vh;
+		width: 50vw;
+		border: 1px solid rgba(40, 40, 40);
+		position: fixed;
+		background: transparent;
+	}
+
+	#notice_ok:hover, #notice_hide:hover {
+		cursor: pointer;
+	}
+
+	#notice_ok {
+		bottom: 0;
+		right: 0;
+	}
+
+	#notice_hide {
+		left: 0;
+		bottom: 0;
+	}
+
+@media only screen and (max-width: 768px) {
+	.main .field {
+		font-size: 4vh;
+		margin: 0.5vh 0vw;
+		border: none;
+		box-shadow: 0px 0px 1vh gray;
+	}
+
+	.profile {
+		height: 20vh;
+		border-top: solid 2px gray;
+		border-bottom: solid 2px gray;
+	}
+
+	img {
+		height: 20vh;
+		width: 20vh;
+	}
+
+	.description {
+		float: right;
+		width: calc(100% - 20vh - 4vw);
+		text-align: left;
+		padding: 2vh 2vw 0vh;
+		font-size: 3vh;
+		background: none;
+		border: none;
+	}
+
+	.description span {
+		float: right;
+		padding-right: 5vw;
+	}
+
+}
+
+@media only screen and (min-width: 769px) {
+	#profiles {
+		padding-top: 5vh;
+	}
+
+	.description {
+		height: 18vh;
+		width: calc(100% - 20vh - 2vw);
+		text-align: left;
+		padding: 2vh 1vw 0vh;
+		font-size: 2.5vh;
+		background: none;
+		border: none;
+		float: right;
+
+	}
+
+	.description span {
+		float: right;
+		padding-right: 1vw;
+	}
+
+	.main .field {
+		font-size: 2.5vh;
+		border: none;
+	}
+
+	.main .field:hover {
+		background: #133756;
+		width: 90%;
+		color: white;
+		box-shadow: 2px 2px 2px gray;
+	}
+
+	.focus {
+		background: #133756;
+		width: 90%;
+		color: white;
+		box-shadow: 2px 2px 2px gray;
+	}
+
+	.unfocus {
+		width: 80%;
+	}
+
+	img {
+		width: 20vh;
+		height: 20vh;
+		float: left;
+	}
+
+	.profile {
+		position: relative;
+		margin-bottom: 3vh;
+		margin-right: 10%;
+		padding: 0;
+	}
+
+	.profile button:hover {
+		cursor: pointer;
+	}
+
+	.profile:after, .profile:before {
+		height: 5vh;
+		width: 5vh;
+		position: absolute;
+		content: '';
+		transition: all 0.3s ease;
+		opacity: 0;
+	}
+
+	.profile:before {
+		right: 0;
+		top: 0;
+		border-right: 3px solid #ff7a59;
+		border-top: 3px solid #ff7a59;
+		transform: translate(-100%, 50%);
+	}
+
+	.profile:after {
+		left: 0;
+		bottom: 0;
+		border-left: 3px solid #ff7a59;
+		border-bottom: 3px solid #ff7a59;
+		transform: translate(100%, -50%);
+	}
+
+	.profile:hover:after, .profile:hover:before {
+		transform: translate(0%, 0%);
+		opacity: 1;
+	}
+}
+
+</style>
+
+<script type="text/javascript">
+	var focus = false;
+
+	$(window).on('load', function() {
+		if ($(document).width() <= 768) {
+			$('#profiles').hide();
+		}
+
+		if (!localStorage.getItem('notice_hide')) {
+			$('#notice').show();
+		}
+	});
+
+	$(window).on("resize", function() {
+		if ($(document).width() > 768) {
+			$('.field').css('display', 'block');
+			$('#fields').show();
+		} else {
+			if (focus) {
+				$('#fields').hide();
+			} else {
+				$('#fields').show();
+				filter_fields($('#keyword')[0].value);
+			}
+		}
+
+		if (focus) {
+			$('#profiles').show();
+		} else {
+			$('#profiles').hide();
+		}
+	})
+
+	$('.field').click(function() {
+		if (!($(this).hasClass('focus'))) {
+			focus = true;
+			$('.field').removeClass('focus').addClass('unfocus');
+			$(this).removeClass('unfocus').addClass('focus');
+			$('#keyword')[0].value = $(this)[0].id;
+		}
+	});
+
+	$('#back').click(function() {
+		focus = false;
+		$('.field').removeClass('focus').addClass('unfocus');
+		$('#keyword')[0].value = '';
+		filter_fields('');
+
+		$('#profiles').fadeOut(300, function() {
+			$('#fields').show('slide', { direction: 'left', transition: 'ease-out'}, 500);
+		});
+	});
+
+	function get_profiles(field) {
+		$("#profiles").fadeOut(100, function() {
+        	$(".profile").remove();
+			$.ajax({
+	            url: "../category/",
+	            method: "POST",
+	            data: {
+	                field: field,
+	                csrfmiddlewaretoken: '{{ csrf_token }}'
+	            },
+	            success: function(response) {
+	            	if (response.length == 0) {
+	                	$("#profiles").append("<div class='profile' style='border: none; padding: 50px 10%; font-size: 1.5em'>Sorry, there are currently no users related to the field you clicked</div>");
+	            	}
+
+	                for (i = 0; i < response.length; i++) {
+	                	var profile = response[i];
+	                	var form = document.createElement('form');
+	                	form.className = 'col-4 profile';
+	                	if (profile['company'] != '') {
+	                		form.innerHTML += '<button><img src="{% static "las/css/default.jpg" %}"><div class="description">' + profile['username'] + '<span>' + profile['post__count'] + ' posts</span><br><br>' + profile['title'] + '<br>at ' + profile['company'] + '</div></button>';
+	                	} else {
+	                		form.innerHTML += '<button>' + profile['username'] + '<br><br>' + profile['title'] + '</button>';
+	                	}
+	                	form.innerHTML += "<input type='hidden' name='poster' value=" + profile['username'] + "></input>"
+	                	form.action = '{% url "profile" %}'
+	                	form.method = 'GET';
+	                	$("#profiles").append(form);
+	                }
+
+	                if ($(document).width() <= 768) {
+						$('#fields').hide('slide', { direction: 'left', transition: 'ease-out'}, 300, function() {
+							$('#profiles').fadeIn(300);
+						});
+					} else {
+		                $("#profiles").fadeIn(300);
+					}
+	            }
+	        });
+        });
+	}
+
+	function filter_fields(keyword) {
+		if (keyword == '') {
+			$('.field').css('display', 'block');
+		} else {
+			for (i = 0; i < $('.field').length; i++) {
+				if ($('.field')[i].id.toLowerCase().startsWith(keyword.toLowerCase())) {
+					$('.field')[i].style.display = 'block';
+				} else {
+					$('.field')[i].style.display = 'none';
+				}
+			}
+		}
+	}
+
+	function hide_notice() {
+		$("#notice").hide();
+	}
+
+	function disable_notice() {
+		localStorage.setItem('notice_hide', true);
+		hide_notice();
+	}
+</script>
+
+{% endblock %}
